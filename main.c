@@ -1924,13 +1924,13 @@ int main()
     // order("aditya","ramnagar","7846247891","northindian",agentroot,2,userroot,2,2,restaurantroot);
     // order("john","kasnagar","7846247891","southindian",agentroot,3,userroot,4,2,restaurantroot);
     // order("smit","vijaynagar","7846247891","Italian",agentroot,4,userroot,5,2,restaurantroot);
-    // ////// restaurantnode* root=restaurantroot;
+    // // ////// restaurantnode* root=restaurantroot;
     
-    // //// // restordersnode* restorderhead=root->left->ordershead;
-    // //// // printf("%s",restorderhead->order);
-    // //// // printf("%d",restorderhead->count);
+    // // //// // restordersnode* restorderhead=root->left->ordershead;
+    // // //// // printf("%s",restorderhead->order);
+    // // //// // printf("%d",restorderhead->count);
     
-    // findfavoritefoodsacrossrestaurants(restaurantroot);
+    //  findfavoritefoodsacrossrestaurants(restaurantroot);
     
     
     //Q8
@@ -1940,7 +1940,7 @@ int main()
     // order("john","kasnagar","7846247891","southindian",agentroot,3,userroot,4,2,restaurantroot);
     // order("smit","vijaynagar","7846247891","Italian",agentroot,4,userroot,5,2,restaurantroot);
     
-    //rock didn't order anything.
+    //////rock didn't order anything.
     //rangeutravel(userroot,2,5);
     //// rangeutravel(userroot,2,4);
     //// rangeutravel(userroot,3,3);
