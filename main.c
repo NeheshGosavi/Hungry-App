@@ -7,6 +7,7 @@
 #include<string.h>
 typedef struct globalordersnode{
     int balancefactor;
+    int height;
     int data;//data means agentid
     char order[100];
     int restid;
@@ -37,11 +38,13 @@ globalordersnode* makeglobalordersnode(int id,char*order,int restid)
     temp->left=0;
     temp->right=0;
     temp->balancefactor=0;
+    temp->height=1;
     return temp;
 }
 
 typedef struct prevordersnode{
     int balancefactor;
+    int height;
     int data;
     char order[100];
     int month;
@@ -59,11 +62,13 @@ prevordersnode* makeprevordersnode(char* order,int month)
     temp->left=0;
     temp->right=0;
     temp->balancefactor=0;
+    temp->height=1;
     temp->data=globalorderid;
     return temp;
 }
 typedef struct restordersnode{
     int balancefactor;
+    int height;
     int data;
     char order[100];
     int month;
@@ -81,11 +86,13 @@ restordersnode* makerestordersnode(char* order,int month)
     temp->left=0;
     temp->right=0;
     temp->balancefactor=0;
+    temp->height=1;
     temp->data=globalorderid;
     return temp;
 }
 typedef struct restaurantnode{
     int balancefactor;
+    int height;
     int data;//data matlab restid
     char address[100];
     int seats;
@@ -108,12 +115,14 @@ restaurantnode* makerestaurantnode(int id,char* address,int s,char*facility,char
     temp->left=0;
     temp->right=0;
     temp->balancefactor=0;
+    temp->height=1;
     temp->ordercount=0;
     return temp;
 }
 
 typedef struct agentnode{
     int balancefactor;
+    int height;
     int data;//data matlab agentid
     char name[100];
     char phoneno[15];
@@ -133,10 +142,12 @@ agentnode* makeagentnode(char* name,int id,char*phoneno)
     temp->left=0;
     temp->right=0;
     temp->balancefactor=0;
+    temp->height=1;
     return temp;
 }
 typedef struct usernode{
     int balancefactor;
+    int height;
     int data;//data matlab userid
     char name[100];
     char address[100];
@@ -156,6 +167,7 @@ usernode* makeusernode(char*name,int id,char*phoneno,char* address)
     temp->left=0;
     temp->right=0;
     temp->balancefactor=0;
+    temp->height=1;
     return temp;
 }
 int max(int a,int b)
@@ -163,12 +175,24 @@ int max(int a,int b)
     if(a>b) return a;
     else return b;
 }
+
+int gheight(globalordersnode* root)
+{
+    if (root == 0) return 0;
+    return root->height;
+}
 globalordersnode* gLL(globalordersnode* root)
 {
     globalordersnode* temp=root->left;
     globalordersnode* tempright=temp->right;
     temp->right=root;
     root->left=tempright;
+    
+    //now first update height of A and then height of B because B is above A.
+    
+    root->height=max(gheight(root->left),gheight(root->right))+1;
+    temp->height=max(gheight(temp->left),gheight(temp->right))+1;
+    
     return temp;
 }
 globalordersnode* gRR(globalordersnode* root)
@@ -177,6 +201,12 @@ globalordersnode* gRR(globalordersnode* root)
     globalordersnode* templeft=temp->left;
     temp->left=root;
     root->right=templeft;
+    
+    //now first update height of A and then height of B because B is above A.
+    
+    root->height=max(gheight(root->left),gheight(root->right))+1;
+    temp->height=max(gheight(temp->left),gheight(temp->right))+1;
+    
     return temp;
 }
 globalordersnode* gLR(globalordersnode* root)
@@ -187,6 +217,13 @@ globalordersnode* gLR(globalordersnode* root)
     root->left=tempc->right;
     tempc->left=tempb;
     tempc->right=root;
+    
+    //now first update height of A and height of B then update height of C because C is above A and B
+    
+    tempb->height=max(gheight(tempb->left),gheight(tempb->right))+1;
+    root->height=max(gheight(root->left),gheight(root->right))+1;
+    tempc->height=max(gheight(tempc->left),gheight(tempc->right))+1;
+    
     return tempc;
 }
 globalordersnode* gRL(globalordersnode* root)
@@ -197,15 +234,33 @@ globalordersnode* gRL(globalordersnode* root)
     root->right=tempc->left;
     tempc->right=tempb;
     tempc->left=root;
+    
+    //now first update height of A and height of B then update height of C because C is above A and B
+    
+    tempb->height=max(gheight(tempb->left),gheight(tempb->right))+1;
+    root->height=max(gheight(root->left),gheight(root->right))+1;
+    tempc->height=max(gheight(tempc->left),gheight(tempc->right))+1;
+    
     return tempc;
 }
 
+int pheight(prevordersnode* root)
+{
+    if (root == 0) return 0;
+    return root->height;
+}
 prevordersnode* pLL(prevordersnode* root)
 {
     prevordersnode* temp=root->left;
     prevordersnode* tempright=temp->right;
     temp->right=root;
     root->left=tempright;
+    
+    //now first update height of A and then height of B because B is above A.
+    
+    root->height=max(pheight(root->left),pheight(root->right))+1;
+    temp->height=max(pheight(temp->left),pheight(temp->right))+1;
+    
     return temp;
 }
 prevordersnode* pRR(prevordersnode* root)
@@ -214,6 +269,12 @@ prevordersnode* pRR(prevordersnode* root)
     prevordersnode* templeft=temp->left;
     temp->left=root;
     root->right=templeft;
+    
+    //now first update height of A and then height of B because B is above A.
+    
+    root->height=max(pheight(root->left),pheight(root->right))+1;
+    temp->height=max(pheight(temp->left),pheight(temp->right))+1;
+    
     return temp;
 }
 prevordersnode* pLR(prevordersnode* root)
@@ -224,6 +285,13 @@ prevordersnode* pLR(prevordersnode* root)
     root->left=tempc->right;
     tempc->left=tempb;
     tempc->right=root;
+    
+    //now first update height of A and height of B then update height of C because C is above A and B
+    
+    tempb->height=max(pheight(tempb->left),pheight(tempb->right))+1;
+    root->height=max(pheight(root->left),pheight(root->right))+1;
+    tempc->height=max(pheight(tempc->left),pheight(tempc->right))+1;
+    
     return tempc;
 }
 prevordersnode* pRL(prevordersnode* root)
@@ -234,15 +302,33 @@ prevordersnode* pRL(prevordersnode* root)
     root->right=tempc->left;
     tempc->right=tempb;
     tempc->left=root;
+    
+    //now first update height of A and height of B then update height of C because C is above A and B
+    
+    tempb->height=max(pheight(tempb->left),pheight(tempb->right))+1;
+    root->height=max(pheight(root->left),pheight(root->right))+1;
+    tempc->height=max(pheight(tempc->left),pheight(tempc->right))+1;
+    
     return tempc;
 }
 
+int roheight(restordersnode* root)
+{
+    if (root == 0) return 0;
+    return root->height;
+}
 restordersnode* roLL(restordersnode* root)
 {
     restordersnode* temp=root->left;
     restordersnode* tempright=temp->right;
     temp->right=root;
     root->left=tempright;
+    
+    //now first update height of A and then height of B because B is above A.
+    
+    root->height=max(roheight(root->left),roheight(root->right))+1;
+    temp->height=max(roheight(temp->left),roheight(temp->right))+1;
+    
     return temp;
 }
 restordersnode* roRR(restordersnode* root)
@@ -251,6 +337,12 @@ restordersnode* roRR(restordersnode* root)
     restordersnode* templeft=temp->left;
     temp->left=root;
     root->right=templeft;
+    
+    //now first update height of A and then height of B because B is above A.
+    
+    root->height=max(roheight(root->left),roheight(root->right))+1;
+    temp->height=max(roheight(temp->left),roheight(temp->right))+1;
+    
     return temp;
 }
 restordersnode* roLR(restordersnode* root)
@@ -261,6 +353,13 @@ restordersnode* roLR(restordersnode* root)
     root->left=tempc->right;
     tempc->left=tempb;
     tempc->right=root;
+    
+    //now first update height of A and height of B then update height of C because C is above A and B
+    
+    tempb->height=max(roheight(tempb->left),roheight(tempb->right))+1;
+    root->height=max(roheight(root->left),roheight(root->right))+1;
+    tempc->height=max(roheight(tempc->left),roheight(tempc->right))+1;
+    
     return tempc;
 }
 restordersnode* roRL(restordersnode* root)
@@ -271,15 +370,33 @@ restordersnode* roRL(restordersnode* root)
     root->right=tempc->left;
     tempc->right=tempb;
     tempc->left=root;
+    
+    //now first update height of A and height of B then update height of C because C is above A and B
+    
+    tempb->height=max(roheight(tempb->left),roheight(tempb->right))+1;
+    root->height=max(roheight(root->left),roheight(root->right))+1;
+    tempc->height=max(roheight(tempc->left),roheight(tempc->right))+1;
+    
     return tempc;
 }
 
+int rheight(restaurantnode* root)
+{
+    if (root == 0) return 0;
+    return root->height;
+}
 restaurantnode* rLL(restaurantnode* root)
 {
     restaurantnode* temp=root->left;
     restaurantnode* tempright=temp->right;
     temp->right=root;
     root->left=tempright;
+    
+    //now first update height of A and then height of B because B is above A.
+    
+    root->height=max(rheight(root->left),rheight(root->right))+1;
+    temp->height=max(rheight(temp->left),rheight(temp->right))+1;
+    
     return temp;
 }
 restaurantnode* rRR(restaurantnode* root)
@@ -288,6 +405,12 @@ restaurantnode* rRR(restaurantnode* root)
     restaurantnode* templeft=temp->left;
     temp->left=root;
     root->right=templeft;
+    
+    //now first update height of A and then height of B because B is above A.
+    
+    root->height=max(rheight(root->left),rheight(root->right))+1;
+    temp->height=max(rheight(temp->left),rheight(temp->right))+1;
+    
     return temp;
 }
 restaurantnode* rLR(restaurantnode* root)
@@ -298,6 +421,13 @@ restaurantnode* rLR(restaurantnode* root)
     root->left=tempc->right;
     tempc->left=tempb;
     tempc->right=root;
+    
+    //now first update height of A and height of B then update height of C because C is above A and B
+    
+    tempb->height=max(rheight(tempb->left),rheight(tempb->right))+1;
+    root->height=max(rheight(root->left),rheight(root->right))+1;
+    tempc->height=max(rheight(tempc->left),rheight(tempc->right))+1;
+
     return tempc;
 }
 restaurantnode* rRL(restaurantnode* root)
@@ -308,15 +438,33 @@ restaurantnode* rRL(restaurantnode* root)
     root->right=tempc->left;
     tempc->right=tempb;
     tempc->left=root;
+    
+    //now first update height of A and height of B then update height of C because C is above A and B
+    
+    tempb->height=max(rheight(tempb->left),rheight(tempb->right))+1;
+    root->height=max(rheight(root->left),rheight(root->right))+1;
+    tempc->height=max(rheight(tempc->left),rheight(tempc->right))+1;
+    
     return tempc;
 }
 
+int aheight(agentnode* root)
+{
+    if (root == 0) return 0;
+    return root->height;
+}
 agentnode* aLL(agentnode* root)
 {
     agentnode* temp=root->left;
     agentnode* tempright=temp->right;
     temp->right=root;
     root->left=tempright;
+    
+    //now first update height of A and then height of B because B is above A.
+    
+    root->height=max(aheight(root->left),aheight(root->right))+1;
+    temp->height=max(aheight(temp->left),aheight(temp->right))+1;
+    
     return temp;
 }
 agentnode* aRR(agentnode* root)
@@ -325,6 +473,12 @@ agentnode* aRR(agentnode* root)
     agentnode* templeft=temp->left;
     temp->left=root;
     root->right=templeft;
+    
+    //now first update height of A and then height of B because B is above A.
+    
+    root->height=max(aheight(root->left),aheight(root->right))+1;
+    temp->height=max(aheight(temp->left),aheight(temp->right))+1;
+    
     return temp;
 }
 agentnode* aLR(agentnode* root)
@@ -335,6 +489,13 @@ agentnode* aLR(agentnode* root)
     root->left=tempc->right;
     tempc->left=tempb;
     tempc->right=root;
+    
+    //now first update height of A and height of B then update height of C because C is above A and B
+    
+    tempb->height=max(aheight(tempb->left),aheight(tempb->right))+1;
+    root->height=max(aheight(root->left),aheight(root->right))+1;
+    tempc->height=max(aheight(tempc->left),aheight(tempc->right))+1;
+    
     return tempc;
 }
 agentnode* aRL(agentnode* root)
@@ -345,15 +506,33 @@ agentnode* aRL(agentnode* root)
     root->right=tempc->left;
     tempc->right=tempb;
     tempc->left=root;
+    
+    //now first update height of A and height of B then update height of C because C is above A and B
+    
+    tempb->height=max(aheight(tempb->left),aheight(tempb->right))+1;
+    root->height=max(aheight(root->left),aheight(root->right))+1;
+    tempc->height=max(aheight(tempc->left),aheight(tempc->right))+1;
+    
     return tempc;
 }
 
+int uheight(usernode* root)
+{
+    if (root == 0) return 0;
+    return root->height;
+}
 usernode* uLL(usernode* root)
 {
     usernode* temp=root->left;
     usernode* tempright=temp->right;
     temp->right=root;
     root->left=tempright;
+    
+    //now first update height of A and then height of B because B is above A.
+    
+    root->height=max(uheight(root->left),uheight(root->right))+1;
+    temp->height=max(uheight(temp->left),uheight(temp->right))+1;
+    
     return temp;
 }
 usernode* uRR(usernode* root)
@@ -362,6 +541,12 @@ usernode* uRR(usernode* root)
     usernode* templeft=temp->left;
     temp->left=root;
     root->right=templeft;
+    
+    //now first update height of A and then height of B because B is above A.
+    
+    root->height=max(uheight(root->left),uheight(root->right))+1;
+    temp->height=max(uheight(temp->left),uheight(temp->right))+1;
+    
     return temp;
 }
 usernode* uLR(usernode* root)
@@ -372,6 +557,13 @@ usernode* uLR(usernode* root)
     root->left=tempc->right;
     tempc->left=tempb;
     tempc->right=root;
+    
+    //now first update height of A and height of B then update height of C because C is above A and B
+    
+    tempb->height=max(uheight(tempb->left),uheight(tempb->right))+1;
+    root->height=max(uheight(root->left),uheight(root->right))+1;
+    tempc->height=max(uheight(tempc->left),uheight(tempc->right))+1;
+    
     return tempc;
 }
 usernode* uRL(usernode* root)
@@ -382,6 +574,13 @@ usernode* uRL(usernode* root)
     root->right=tempc->left;
     tempc->right=tempb;
     tempc->left=root;
+    
+    //now first update height of A and height of B then update height of C because C is above A and B
+    
+    tempb->height=max(uheight(tempb->left),uheight(tempb->right))+1;
+    root->height=max(uheight(root->left),uheight(root->right))+1;
+    tempc->height=max(uheight(tempc->left),uheight(tempc->right))+1;
+    
     return tempc;
 }
 
@@ -395,13 +594,13 @@ usernode* uRL(usernode* root)
 //     root->right=construct(root->right,arr,mid+1,end);
 //     return root;
 // }
-int gheight(globalordersnode* root)
-{
-    if(root==0) return 0;
-    int leftans=gheight(root->left);
-    int rightans=gheight(root->right);
-    return (max(leftans,rightans)+1);
-}
+
+//this is insertion in AVL tree function which does insertion in O(log n) time
+
+//step1 normal BST insertion
+//step2 in return phase first update height and then identify the first violating node and perform rotation on it
+
+//this flag is to identify the first violation in return phase and when we get that we will turn flag to 0 
 globalordersnode* ginsert(globalordersnode* root,int* flag,int agentid,char* menu,int restid)
 {
     if(root==0)
@@ -412,7 +611,12 @@ globalordersnode* ginsert(globalordersnode* root,int* flag,int agentid,char* men
     if(root->data<agentid)
     {
         root->right=ginsert(root->right,flag,agentid,menu,restid);
+        
+        //now in return phase step1 is to update height and step2 is to update balance factor.
+        
+        root->height=max(gheight(root->left),gheight(root->right))+1;
         root->balancefactor=gheight(root->left)-gheight(root->right);
+        
         if((root->balancefactor<-1||root->balancefactor>1)&&*flag)
         {
             *flag=0;
@@ -438,7 +642,10 @@ globalordersnode* ginsert(globalordersnode* root,int* flag,int agentid,char* men
     else if(root->data>agentid)
     {
         root->left=ginsert(root->left,flag,agentid,menu,restid);
+        
+        root->height=max(gheight(root->left),gheight(root->right))+1;
         root->balancefactor=gheight(root->left)-gheight(root->right);
+        
         if((root->balancefactor<-1||root->balancefactor>1)&&*flag)
         {
             *flag=0;
@@ -470,12 +677,23 @@ globalordersnode* gfindsuccessor(globalordersnode* root)
     while(mov->left!=0) mov=mov->left;
     return mov;
 }
+
+//this is deletion in AVL tree function which does deletion in O(log n) time
+
+//step1 normal BST delete as traveldelete funtion.
+//step2 in return phase first update height and then identify the first violating node and perform rotation on it
+
+//this flag is to identify the first violation in return phase and when we get that we will turn flag to 0 
+
 globalordersnode* gsearchdelete(globalordersnode* root,int agentid,int* flag)
 {
     if(agentid<root->data)
     {
         root->left=gsearchdelete(root->left,agentid,flag);
+        
+        root->height=max(gheight(root->left),gheight(root->right))+1;
         root->balancefactor=gheight(root->left)-gheight(root->right);
+        
         if((root->balancefactor<-1||root->balancefactor>1)&&*flag)
         {
             *flag=0;
@@ -501,7 +719,10 @@ globalordersnode* gsearchdelete(globalordersnode* root,int agentid,int* flag)
     else if(agentid>root->data)
     {
         root->right=gsearchdelete(root->right,agentid,flag);
+        
+        root->height=max(gheight(root->left),gheight(root->right))+1;
         root->balancefactor=gheight(root->left)-gheight(root->right);
+        
         if((root->balancefactor<-1||root->balancefactor>1)&&*flag)
         {
             *flag=0;
@@ -538,7 +759,10 @@ globalordersnode* gsearchdelete(globalordersnode* root,int agentid,int* flag)
             successor->data=temp;
             
             root->right=gsearchdelete(root->right,agentid,flag);
+            
+            root->height=max(gheight(root->left),gheight(root->right))+1;
             root->balancefactor=gheight(root->left)-gheight(root->right);
+            
             if((root->balancefactor<-1||root->balancefactor>1)&&*flag)
             {
                 *flag=0;
@@ -573,13 +797,7 @@ globalordersnode* gsearchdelete(globalordersnode* root,int agentid,int* flag)
 //     root->right=construct(root->right,arr,mid+1,end);
 //     return root;
 // }
-int pheight(prevordersnode* root)
-{
-    if(root==0) return 0;
-    int leftans=pheight(root->left);
-    int rightans=pheight(root->right);
-    return (max(leftans,rightans)+1);
-}
+
 prevordersnode* pinsert(prevordersnode* root,int x,int* flag,char*menu,int month)
 {
     if(root==0)
@@ -590,7 +808,10 @@ prevordersnode* pinsert(prevordersnode* root,int x,int* flag,char*menu,int month
     if(root->data<x)
     {
         root->right=pinsert(root->right,x,flag,menu,month);
+        
+        root->height=max(pheight(root->left),pheight(root->right))+1;
         root->balancefactor=pheight(root->left)-pheight(root->right);
+        
         if((root->balancefactor<-1||root->balancefactor>1)&&*flag)
         {
             *flag=0;
@@ -616,7 +837,10 @@ prevordersnode* pinsert(prevordersnode* root,int x,int* flag,char*menu,int month
     else if(root->data>x)
     {
         root->left=pinsert(root->left,x,flag,menu,month);
+        
+        root->height=max(pheight(root->left),pheight(root->right))+1;
         root->balancefactor=pheight(root->left)-pheight(root->right);
+        
         if((root->balancefactor<-1||root->balancefactor>1)&&*flag)
         {
             *flag=0;
@@ -653,7 +877,10 @@ prevordersnode* psearchdelete(prevordersnode* root,int x,int* flag)
     if(x<root->data)
     {
         root->left=psearchdelete(root->left,x,flag);
+        
+        root->height=max(pheight(root->left),pheight(root->right))+1;
         root->balancefactor=pheight(root->left)-pheight(root->right);
+        
         if((root->balancefactor<-1||root->balancefactor>1)&&*flag)
         {
             *flag=0;
@@ -679,7 +906,10 @@ prevordersnode* psearchdelete(prevordersnode* root,int x,int* flag)
     else if(x>root->data)
     {
         root->right=psearchdelete(root->right,x,flag);
+        
+        root->height=max(pheight(root->left),pheight(root->right))+1;
         root->balancefactor=pheight(root->left)-pheight(root->right);
+        
         if((root->balancefactor<-1||root->balancefactor>1)&&*flag)
         {
             *flag=0;
@@ -716,7 +946,10 @@ prevordersnode* psearchdelete(prevordersnode* root,int x,int* flag)
             successor->data=temp;
             
             root->right=psearchdelete(root->right,x,flag);
+            
+            root->height=max(pheight(root->left),pheight(root->right))+1;
             root->balancefactor=pheight(root->left)-pheight(root->right);
+            
             if((root->balancefactor<-1||root->balancefactor>1)&&*flag)
             {
                 *flag=0;
@@ -752,13 +985,7 @@ prevordersnode* psearchdelete(prevordersnode* root,int x,int* flag)
 //     root->right=construct(root->right,arr,mid+1,end);
 //     return root;
 // }
-int roheight(restordersnode* root)
-{
-    if(root==0) return 0;
-    int leftans=roheight(root->left);
-    int rightans=roheight(root->right);
-    return (max(leftans,rightans)+1);
-}
+
 restordersnode* roinsert(restordersnode* root,int x,int* flag,char*menu,int month)
 {
     if(root==0)
@@ -769,7 +996,10 @@ restordersnode* roinsert(restordersnode* root,int x,int* flag,char*menu,int mont
     if(root->data<x)
     {
         root->right=roinsert(root->right,x,flag,menu,month);
+        
+        root->height=max(roheight(root->left),roheight(root->right))+1;
         root->balancefactor=roheight(root->left)-roheight(root->right);
+        
         if((root->balancefactor<-1||root->balancefactor>1)&&*flag)
         {
             *flag=0;
@@ -795,7 +1025,10 @@ restordersnode* roinsert(restordersnode* root,int x,int* flag,char*menu,int mont
     else if(root->data>x)
     {
         root->left=roinsert(root->left,x,flag,menu,month);
+        
+        root->height=max(roheight(root->left),roheight(root->right))+1;
         root->balancefactor=roheight(root->left)-roheight(root->right);
+        
         if((root->balancefactor<-1||root->balancefactor>1)&&*flag)
         {
             *flag=0;
@@ -832,7 +1065,10 @@ restordersnode* rosearchdelete(restordersnode* root,int x,int* flag)
     if(x<root->data)
     {
         root->left=rosearchdelete(root->left,x,flag);
+        
+        root->height=max(roheight(root->left),roheight(root->right))+1;
         root->balancefactor=roheight(root->left)-roheight(root->right);
+        
         if((root->balancefactor<-1||root->balancefactor>1)&&*flag)
         {
             *flag=0;
@@ -858,7 +1094,10 @@ restordersnode* rosearchdelete(restordersnode* root,int x,int* flag)
     else if(x>root->data)
     {
         root->right=rosearchdelete(root->right,x,flag);
+        
+        root->height=max(roheight(root->left),roheight(root->right))+1;
         root->balancefactor=roheight(root->left)-roheight(root->right);
+        
         if((root->balancefactor<-1||root->balancefactor>1)&&*flag)
         {
             *flag=0;
@@ -895,7 +1134,10 @@ restordersnode* rosearchdelete(restordersnode* root,int x,int* flag)
             successor->data=temp;
             
             root->right=rosearchdelete(root->right,x,flag);
+            
+            root->height=max(roheight(root->left),roheight(root->right))+1;
             root->balancefactor=roheight(root->left)-roheight(root->right);
+            
             if((root->balancefactor<-1||root->balancefactor>1)&&*flag)
             {
                 *flag=0;
@@ -930,13 +1172,7 @@ restordersnode* rosearchdelete(restordersnode* root,int x,int* flag)
 //     root->right=construct(root->right,arr,mid+1,end);
 //     return root;
 // }
-int rheight(restaurantnode* root)
-{
-    if(root==0) return 0;
-    int leftans=rheight(root->left);
-    int rightans=rheight(root->right);
-    return (max(leftans,rightans)+1);
-}
+
 restaurantnode* rinsert(restaurantnode* root,int restid,int* flag,char* address,int seats,char* category,char* menu)
 {
     if(root==0)
@@ -947,7 +1183,10 @@ restaurantnode* rinsert(restaurantnode* root,int restid,int* flag,char* address,
     if(root->data<restid)
     {
         root->right=rinsert(root->right,restid,flag,address,seats,category,menu);
+        
+        root->height=max(rheight(root->left),rheight(root->right))+1;
         root->balancefactor=rheight(root->left)-rheight(root->right);
+        
         if((root->balancefactor<-1||root->balancefactor>1)&&*flag)
         {
             *flag=0;
@@ -973,7 +1212,10 @@ restaurantnode* rinsert(restaurantnode* root,int restid,int* flag,char* address,
     else if(root->data>restid)
     {
         root->left=rinsert(root->left,restid,flag,address,seats,category,menu);
+        
+        root->height=max(rheight(root->left),rheight(root->right))+1;
         root->balancefactor=rheight(root->left)-rheight(root->right);
+        
         if((root->balancefactor<-1||root->balancefactor>1)&&*flag)
         {
             *flag=0;
@@ -1010,7 +1252,10 @@ restaurantnode* rsearchdelete(restaurantnode* root,int x,int* flag)
     if(x<root->data)
     {
         root->left=rsearchdelete(root->left,x,flag);
+        
+        root->height=max(rheight(root->left),rheight(root->right))+1;
         root->balancefactor=rheight(root->left)-rheight(root->right);
+        
         if((root->balancefactor<-1||root->balancefactor>1)&&*flag)
         {
             *flag=0;
@@ -1036,7 +1281,10 @@ restaurantnode* rsearchdelete(restaurantnode* root,int x,int* flag)
     else if(x>root->data)
     {
         root->right=rsearchdelete(root->right,x,flag);
+        
+        root->height=max(rheight(root->left),rheight(root->right))+1;
         root->balancefactor=rheight(root->left)-rheight(root->right);
+        
         if((root->balancefactor<-1||root->balancefactor>1)&&*flag)
         {
             *flag=0;
@@ -1073,7 +1321,10 @@ restaurantnode* rsearchdelete(restaurantnode* root,int x,int* flag)
             successor->data=temp;
             
             root->right=rsearchdelete(root->right,x,flag);
+            
+            root->height=max(rheight(root->left),rheight(root->right))+1;
             root->balancefactor=rheight(root->left)-rheight(root->right);
+            
             if((root->balancefactor<-1||root->balancefactor>1)&&*flag)
             {
                 *flag=0;
@@ -1109,13 +1360,7 @@ restaurantnode* rsearchdelete(restaurantnode* root,int x,int* flag)
 //     root->right=construct(root->right,arr,mid+1,end);
 //     return root;
 // }
-int aheight(agentnode* root)
-{
-    if(root==0) return 0;
-    int leftans=aheight(root->left);
-    int rightans=aheight(root->right);
-    return (max(leftans,rightans)+1);
-}
+
 agentnode* ainsert(agentnode* root,int agentid,int* flag,char* name,char* phoneno)
 {
     if(root==0)
@@ -1126,7 +1371,10 @@ agentnode* ainsert(agentnode* root,int agentid,int* flag,char* name,char* phonen
     if(root->data<agentid)
     {
         root->right=ainsert(root->right,agentid,flag,name,phoneno);
+        
+        root->height=max(aheight(root->left),aheight(root->right))+1;
         root->balancefactor=aheight(root->left)-aheight(root->right);
+        
         if((root->balancefactor<-1||root->balancefactor>1)&&*flag)
         {
             *flag=0;
@@ -1152,7 +1400,10 @@ agentnode* ainsert(agentnode* root,int agentid,int* flag,char* name,char* phonen
     else if(root->data>agentid)
     {
         root->left=ainsert(root->left,agentid,flag,name,phoneno);
+        
+        root->height=max(aheight(root->left),aheight(root->right))+1;
         root->balancefactor=aheight(root->left)-aheight(root->right);
+        
         if((root->balancefactor<-1||root->balancefactor>1)&&*flag)
         {
             *flag=0;
@@ -1189,7 +1440,10 @@ agentnode* asearchdelete(agentnode* root,int x,int* flag)
     if(x<root->data)
     {
         root->left=asearchdelete(root->left,x,flag);
+        
+        root->height=max(aheight(root->left),aheight(root->right))+1;
         root->balancefactor=aheight(root->left)-aheight(root->right);
+        
         if((root->balancefactor<-1||root->balancefactor>1)&&*flag)
         {
             *flag=0;
@@ -1215,7 +1469,10 @@ agentnode* asearchdelete(agentnode* root,int x,int* flag)
     else if(x>root->data)
     {
         root->right=asearchdelete(root->right,x,flag);
+        
+        root->height=max(aheight(root->left),aheight(root->right))+1;
         root->balancefactor=aheight(root->left)-aheight(root->right);
+        
         if((root->balancefactor<-1||root->balancefactor>1)&&*flag)
         {
             *flag=0;
@@ -1252,7 +1509,10 @@ agentnode* asearchdelete(agentnode* root,int x,int* flag)
             successor->data=temp;
             
             root->right=asearchdelete(root->right,x,flag);
+            
+            root->height=max(aheight(root->left),aheight(root->right))+1;
             root->balancefactor=aheight(root->left)-aheight(root->right);
+            
             if((root->balancefactor<-1||root->balancefactor>1)&&*flag)
             {
                 *flag=0;
@@ -1287,13 +1547,7 @@ agentnode* asearchdelete(agentnode* root,int x,int* flag)
 //     root->right=construct(root->right,arr,mid+1,end);
 //     return root;
 // }
-int uheight(usernode* root)
-{
-    if(root==0) return 0;
-    int leftans=uheight(root->left);
-    int rightans=uheight(root->right);
-    return (max(leftans,rightans)+1);
-}
+
 usernode* uinsert(usernode* root,int userid,int* flag,char* name,char* phoneno,char* address)
 {
     if(root==0)
@@ -1304,7 +1558,10 @@ usernode* uinsert(usernode* root,int userid,int* flag,char* name,char* phoneno,c
     if(root->data<userid)
     {
         root->right=uinsert(root->right,userid,flag,name,phoneno,address);
+        
+        root->height=max(uheight(root->left),uheight(root->right))+1;
         root->balancefactor=uheight(root->left)-uheight(root->right);
+        
         if((root->balancefactor<-1||root->balancefactor>1)&&*flag)
         {
             *flag=0;
@@ -1330,7 +1587,10 @@ usernode* uinsert(usernode* root,int userid,int* flag,char* name,char* phoneno,c
     else if(root->data>userid)
     {
         root->left=uinsert(root->left,userid,flag,name,phoneno,address);
+        
+        root->height=max(uheight(root->left),uheight(root->right))+1;
         root->balancefactor=uheight(root->left)-uheight(root->right);
+        
         if((root->balancefactor<-1||root->balancefactor>1)&&*flag)
         {
             *flag=0;
@@ -1367,7 +1627,10 @@ usernode* usearchdelete(usernode* root,int userid,int* flag)
     if(userid<root->data)
     {
         root->left=usearchdelete(root->left,userid,flag);
+        
+        root->height=max(uheight(root->left),uheight(root->right))+1;
         root->balancefactor=uheight(root->left)-uheight(root->right);
+        
         if((root->balancefactor<-1||root->balancefactor>1)&&*flag)
         {
             *flag=0;
@@ -1393,7 +1656,10 @@ usernode* usearchdelete(usernode* root,int userid,int* flag)
     else if(userid>root->data)
     {
         root->right=usearchdelete(root->right,userid,flag);
+        
+        root->height=max(uheight(root->left),uheight(root->right))+1;
         root->balancefactor=uheight(root->left)-uheight(root->right);
+        
         if((root->balancefactor<-1||root->balancefactor>1)&&*flag)
         {
             *flag=0;
@@ -1430,7 +1696,10 @@ usernode* usearchdelete(usernode* root,int userid,int* flag)
             successor->data=temp;
             
             root->right=usearchdelete(root->right,userid,flag);
+            
+            root->height=max(uheight(root->left),uheight(root->right))+1;
             root->balancefactor=uheight(root->left)-uheight(root->right);
+            
             if((root->balancefactor<-1||root->balancefactor>1)&&*flag)
             {
                 *flag=0;
@@ -1852,6 +2121,9 @@ int main()
     flag=1;
     userroot=uinsert(userroot,5,&flag,"smith","7966247891","vijaynagar");
     
+    // printf("%d\n",restaurantroot->data);
+    // printf("%d\n",restaurantroot->left->data);
+    // printf("%d\n",restaurantroot->right->data);
     
     
     //Q1
@@ -1903,10 +2175,10 @@ int main()
     // // // ///dontuncommentjustfordebug/////order("aditya","ramnagar","7846247891","northindian",agenthead,2,userhead,2,2,restauranthead);
     // findfavoritefoodsofuser(3,userroot);
     
-    ////////printliveorders();
-    ////////delivery(1,agenthead,100);
-    ////////printprevorderlistofparticularuser(userhead,1);
-    ///////printliveorders();
+    //////printliveorders();
+    //////delivery(1,agenthead,100);
+    //////printprevorderlistofparticularuser(userhead,1);
+    /////printliveorders();
     
     //Q6
     // order("ganesh","ganeshnagar","7966247891","chinese",agentroot,1,userroot,3,1,restaurantroot);
@@ -1924,13 +2196,13 @@ int main()
     // order("aditya","ramnagar","7846247891","northindian",agentroot,2,userroot,2,2,restaurantroot);
     // order("john","kasnagar","7846247891","southindian",agentroot,3,userroot,4,2,restaurantroot);
     // order("smit","vijaynagar","7846247891","Italian",agentroot,4,userroot,5,2,restaurantroot);
-    // // ////// restaurantnode* root=restaurantroot;
+    // ////// restaurantnode* root=restaurantroot;
     
-    // // //// // restordersnode* restorderhead=root->left->ordershead;
-    // // //// // printf("%s",restorderhead->order);
-    // // //// // printf("%d",restorderhead->count);
+    // //// // restordersnode* restorderhead=root->left->ordershead;
+    // //// // printf("%s",restorderhead->order);
+    // //// // printf("%d",restorderhead->count);
     
-    //  findfavoritefoodsacrossrestaurants(restaurantroot);
+    // findfavoritefoodsacrossrestaurants(restaurantroot);
     
     
     //Q8
@@ -1940,15 +2212,16 @@ int main()
     // order("john","kasnagar","7846247891","southindian",agentroot,3,userroot,4,2,restaurantroot);
     // order("smit","vijaynagar","7846247891","Italian",agentroot,4,userroot,5,2,restaurantroot);
     
-    //////rock didn't order anything.
-    //rangeutravel(userroot,2,5);
-    //// rangeutravel(userroot,2,4);
-    //// rangeutravel(userroot,3,3);
+    // rock didn't order anything.
+    // rangeutravel(userroot,2,5);
+    // rangeutravel(userroot,2,4);
+    // rangeutravel(userroot,3,3);
     
     
     
     return 0;
 }
+
 
 
 
